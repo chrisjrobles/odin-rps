@@ -29,34 +29,44 @@ const getWinner = (playerSelection, computerSelection) => {
   else return PLAYER_WINS_CODE;
 }
 
-const playRound = (round, score) => {
-  console.log(`ROUND ${round} ---- FIGHT`);
-  const userMove = prompt('ENTER A MOVE');
+const getNewScore = () => ({
+  [IMPROPER_INPUT_CODE]: 0,
+  [TIE_CODE]: 0,
+  [PLAYER_WINS_CODE]: 0,
+  [PLAYERS_LOSES_CODE]: 0
+});
+
+const resetScore = (score) => {
+  score[IMPROPER_INPUT_CODE] = 0;
+  score[TIE_CODE] = 0;
+  score[PLAYER_WINS_CODE] = 0;
+  score[PLAYERS_LOSES_CODE] = 0;
+}
+
+const playRound = (userMove, score) => {
+  const body = document.querySelector('body');
+  const resultDiv = document.createElement('div');
   const result = getWinner(userMove, getComputerChoice());
   score[result]+=1;
-  console.log(RESULT_MESSAGES[result]);
-}
-
-const printResults = (score) => {
-  console.log('\nRESULTS');
-  console.log(`THERE ${score[TIE_CODE] === 1 ? 'WAS' : 'WERE'} ${score[TIE_CODE]} TIE${score[TIE_CODE]!==1?'S':''}`);
-  console.log(`THE FINAL SCORE WAS ${score[PLAYER_WINS_CODE]} - ${score[PLAYERS_LOSES_CODE]} YOU`);
-  console.log(`YOU WERE PRITTY FRICKIN DUMB ${score[IMPROPER_INPUT_CODE]} TIME${score[IMPROPER_INPUT_CODE]!==1?'S':''}. L`);
-}
-
-const game = () => {
-  const score = {
-    [IMPROPER_INPUT_CODE]: 0,
-    [TIE_CODE]: 0,
-    [PLAYER_WINS_CODE]: 0,
-    [PLAYERS_LOSES_CODE]: 0
+  resultDiv.textContent = RESULT_MESSAGES[result];
+  body.appendChild(resultDiv);
+  if (score[PLAYER_WINS_CODE] === 5 || score[PLAYERS_LOSES_CODE] === 5) {
+    console.log(score);
+    const finalDiv = document.createElement('div');
+    finalDiv.textContent = result === PLAYER_WINS_CODE ? 'PLAYER WINS CONGRATS' : 'COMPUTER WINS THE GAME MAJOR L';
+    finalDiv.style.backgroundColor = 'teal';
+    body.appendChild(finalDiv);
+    resetScore(score);
   }
-
-  for (let i=0; i<5; i++) {
-    playRound(i+1, score);
-  }
-
-  printResults(score);
 }
 
-game();
+const score = getNewScore();
+const buttons = document.querySelectorAll('.choiceButton');
+buttons.forEach(button => {
+  const playRoundAction = (e) => {
+    const move = button.getAttribute('id');
+    playRound(move, score);
+  };
+
+  button.addEventListener('click', playRoundAction);
+});
